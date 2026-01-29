@@ -6,9 +6,10 @@ terraform {
     }
     random = {
       source  = "hashicorp/random"
-      version = "~> 3.0"
+      version = "~> 3.5"
     }
   }
+  required_version = ">= 1.6.0"
 }
 
 provider "aws" {
@@ -24,7 +25,7 @@ resource "random_id" "suffix" {
 resource "aws_s3_bucket" "example" {
   bucket = "my-gitops-bucket-${random_id.suffix.hex}"
 
-  # Recommended: enforce bucket owner ownership, disables ACLs
+  # Modern AWS best practice: ownership enforced, no ACLs needed
   ownership_controls {
     rule {
       object_ownership = "BucketOwnerEnforced"
@@ -36,7 +37,7 @@ resource "aws_s3_bucket" "example" {
     enabled = true
   }
 
-  # Optional: block all public access (default is safe)
+  # Block all public access
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true

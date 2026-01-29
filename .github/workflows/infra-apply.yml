@@ -3,18 +3,27 @@ name: GitOps Infra Deploy
 on:
   push:
     branches:
-      - main   # Trigger only when PR is merged to main
+      - main  # triggers only on PR merge to main
 
 jobs:
   apply-infra:
     runs-on: ubuntu-latest
-    environment: production
+    environment: production  # requires approval before running
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.0  # adjust to your version
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
       - name: Terraform Init
         run: terraform init

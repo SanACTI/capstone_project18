@@ -1,18 +1,16 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-  required_version = ">= 1.6.0"
-}
-
 provider "aws" {
   region = "us-east-1"
 }
 
 resource "aws_s3_bucket" "example" {
-  bucket = "gitops-infra-example-bucket-12345"
+  bucket = "my-gitops-bucket-${random_id.suffix.hex}"
+}
+
+resource "aws_s3_bucket_acl" "example_acl" {
+  bucket = aws_s3_bucket.example.id
   acl    = "private"
+}
+
+resource "random_id" "suffix" {
+  byte_length = 4
 }

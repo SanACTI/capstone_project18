@@ -1,0 +1,29 @@
+name: GitOps Infra Deployment
+
+on:
+  push:
+    branches:
+      - main   # Trigger on merge to main
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    environment: production  # Require approval
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init
+        run: terraform init infra
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan infra
+
+      - name: Terraform Apply
+        if: github.event_name == 'push'
+        run: terraform apply -auto-approve tfplan
